@@ -122,9 +122,6 @@ dev-recommendation-ai-tool/
 5. Update relevant README files
 6. Submit a pull request
 
-## License
-
-[Add your license information here]
 
 ## Support
 

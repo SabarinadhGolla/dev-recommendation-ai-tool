@@ -79,14 +79,3 @@ The agent is configured to use:
 - Temperature 0 for deterministic responses
 - Firecrawl MCP server for web scraping tools
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-[Add your license information here]
