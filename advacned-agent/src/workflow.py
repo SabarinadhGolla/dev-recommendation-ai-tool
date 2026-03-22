@@ -6,15 +6,27 @@ from .models import ResearchState, CompanyAnalysis, CompanyInfo
 from .firecrawl import FirecrawlService
 from .prompts import DeveloperToolsPrompts
 
-
 class Workflow:
+    """
+    Main workflow class for developer tools analysis.
+    Orchestrates the process of extracting tools, researching companies, and providing recommendations.
+    """
     def __init__(self):
+        """
+        Initialize the workflow with required services and build the LangGraph workflow.
+        """
         self.firecrawl = FirecrawlService()
         self.llm = ChatAnthropic(model="claude-haiku-4-5-20251001", temperature=0.1)
         self.prompts = DeveloperToolsPrompts()
         self.workflow = self.build_workflow()
 
     def build_workflow(self):
+        """
+        Build the LangGraph state graph with nodes and edges.
+
+        Returns:
+            CompiledStateGraph: The compiled workflow graph.
+        """
         graph = StateGraph(ResearchState)
         graph.add_node("extract_tools", self._extract_tools_step)
         graph.add_node("research", self._research_step)
@@ -26,6 +38,15 @@ class Workflow:
         return graph.compile()
 
     def _extract_tools_step(self, state: ResearchState) -> Dict[str, Any]:
+        """
+        First step: Extract relevant tool names from articles about the query.
+
+        Args:
+            state (ResearchState): Current workflow state.
+
+        Returns:
+            Dict[str, Any]: Updated state with extracted tools.
+        """
         print(f"Finding articles about: {state.query}")
 
         article_query = f"{state.query} tools comparison best alternatives"
@@ -50,7 +71,6 @@ class Workflow:
             HumanMessage(content=self.prompts.tool_extraction_user(state.query, all_content))
         ]
 
-
         try:
             response = self.llm.invoke(messages)
             tool_names = [
@@ -64,7 +84,16 @@ class Workflow:
         
 
     def _analyze_company_content(self, company_name: str, content: str) -> CompanyAnalysis:
+        """
+        Analyze company content using structured LLM output.
 
+        Args:
+            company_name (str): Name of the company/tool.
+            content (str): Scraped website content.
+
+        Returns:
+            CompanyAnalysis: Structured analysis of the company.
+        """
         structured_llm = self.llm.with_structured_output(CompanyAnalysis)
         messages = [
             SystemMessage(content=self.prompts.TOOL_ANALYSIS_SYSTEM),
@@ -88,6 +117,15 @@ class Workflow:
         
 
     def _research_step(self, state: ResearchState) -> Dict[str, Any]:
+        """
+        Second step: Research specific tools/companies and gather detailed information.
+
+        Args:
+            state (ResearchState): Current workflow state with extracted tools.
+
+        Returns:
+            Dict[str, Any]: Updated state with company information.
+        """
         extracted_tools = getattr(state, "extracted_tools", [])
 
         if not extracted_tools:
@@ -140,6 +178,15 @@ class Workflow:
         return {"companies": [company.dict() for company in companies]}
     
     def _analyze_step(self, state: ResearchState) -> Dict[str, Any]:
+        """
+        Third step: Generate final recommendations based on analyzed company data.
+
+        Args:
+            state (ResearchState): Current workflow state with company data.
+
+        Returns:
+            Dict[str, Any]: Updated state with final analysis.
+        """
         print("Generating recommendations based on analyzed data...")
 
         company_data = " ,".join([
@@ -159,6 +206,15 @@ class Workflow:
         
 
     def run(self, query: str) -> ResearchState:
+        """
+        Execute the complete workflow for a given query.
+
+        Args:
+            query (str): The developer tools query to analyze.
+
+        Returns:
+            ResearchState: Final state with all analysis results.
+        """
         initial_state = ResearchState(query=query)
         final_state = self.workflow.invoke(initial_state)
         return ResearchState(**final_state)

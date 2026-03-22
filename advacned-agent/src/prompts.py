@@ -1,6 +1,9 @@
 
 class DeveloperToolsPrompts:
-    """Collection of prompts for analyzing developer tools and technologies"""
+    """
+    Collection of prompts for analyzing developer tools and technologies.
+    Contains system prompts and user prompt generators for different analysis stages.
+    """
 
     # Tool extraction prompts
     TOOL_EXTRACTION_SYSTEM = """You are a tech researcher. Extract specific tool, library, platform, or service names from articles.
@@ -8,6 +11,16 @@ class DeveloperToolsPrompts:
 
     @staticmethod
     def tool_extraction_user(query: str, content: str) -> str:
+        """
+        Generate user prompt for tool extraction from article content.
+
+        Args:
+            query (str): The original search query.
+            content (str): The article content to analyze.
+
+        Returns:
+            str: Formatted prompt for tool extraction.
+        """
         return f"""Query: {query}
                 Article Content: {content}
 
@@ -34,6 +47,16 @@ class DeveloperToolsPrompts:
 
     @staticmethod
     def tool_analysis_user(company_name: str, content: str) -> str:
+        """
+        Generate user prompt for analyzing a specific company/tool.
+
+        Args:
+            company_name (str): Name of the company or tool.
+            content (str): Website content to analyze.
+
+        Returns:
+            str: Formatted prompt for company analysis.
+        """
         return f"""Company/Tool: {company_name}
                 Website Content: {content[:2500]}
 
@@ -54,6 +77,16 @@ class DeveloperToolsPrompts:
 
     @staticmethod
     def recommendations_user(query: str, company_data: str) -> str:
+        """
+        Generate user prompt for providing final recommendations.
+
+        Args:
+            query (str): The original developer query.
+            company_data (str): JSON data of analyzed companies.
+
+        Returns:
+            str: Formatted prompt for recommendations.
+        """
         return f"""Developer Query: {query}
                 Tools/Technologies Analyzed: {company_data}
 

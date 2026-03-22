@@ -1,9 +1,11 @@
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 
-
 class CompanyAnalysis(BaseModel):
-    """Structured output for LLM company analysis focused on developer tools"""
+    """
+    Structured output model for LLM company analysis focused on developer tools.
+    Contains key information about pricing, tech stack, and developer features.
+    """
     pricing_model: str  # Free, Freemium, Paid, Enterprise, Unknown
     is_open_source: Optional[bool] = None
     tech_stack: List[str] = []
@@ -12,8 +14,11 @@ class CompanyAnalysis(BaseModel):
     language_support: List[str] = []
     integration_capabilities: List[str] = []
 
-
 class CompanyInfo(BaseModel):
+    """
+    Model representing detailed information about a company/tool.
+    Includes general info and developer-specific features.
+    """
     name: str
     description: str
     website: str
@@ -27,8 +32,11 @@ class CompanyInfo(BaseModel):
     integration_capabilities: List[str] = []
     developer_experience_rating: Optional[str] = None  # Poor, Good, Excellent
 
-
 class ResearchState(BaseModel):
+    """
+    State model for the research workflow.
+    Tracks the progress and data collected during the analysis process.
+    """
     query: str
     extracted_tools: List[str] = []  # Tools extracted from articles
     companies: List[CompanyInfo] = []
